@@ -90,7 +90,7 @@ timer_elapsed (int64_t then)
 }
 /*Comparator to push threads in sleep list to preserve ascending order */
 bool less_comp(const struct list_elem *a,const struct list_elem *b,void *aux){
-wstruct thread *t1 = list_entry (a, struct thread, elem);
+struct thread *t1 = list_entry (a, struct thread, elem);
 struct thread *t2 = list_entry (b, struct thread, elem);
  if(t1->remaining_time < t2->remaining_time)
   return true;
