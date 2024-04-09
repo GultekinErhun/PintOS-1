@@ -90,9 +90,9 @@ timer_elapsed (int64_t then)
 }
 /*Comparator to push threads in sleep list to preserve ascending order */
 bool less_comp(const struct list_elem *a,const struct list_elem *b,void *aux){
-struct thread *t1 = list_entry (a, struct thread, elem);
+wstruct thread *t1 = list_entry (a, struct thread, elem);
 struct thread *t2 = list_entry (b, struct thread, elem);
- if(t1->wake_ticks < t2->wake_ticks)
+ if(t1->remaining_time < t2->remaining_time)
   return true;
  return false;
 }//end of less_comp function
@@ -111,8 +111,8 @@ timer_sleep (int64_t ticks)
   /* Disable interrupt */
   old_level = intr_disable ();    
   struct thread *cur = thread_current();
-  /*Set the wake_ticks of the current thread to (ticks + start)*/
-  thread_current ()->wake_ticks = ticks + start;
+  /*Set the remaining_time of the current thread to (ticks + start)*/
+  thread_current ()->remaining_time = ticks + start;
   /*Push the sleeped thread to list_sleep in ascending order*/
   list_insert_ordered (&sleep_list,&cur->elem,less_comp,0);    
   thread_block(); 
@@ -218,7 +218,7 @@ while(list_size(&sleep_list))
 {   
     /*Front element in sleep_list which must wake up first (smallest ticks)*/ 
     e = list_front (&sleep_list);
-    if(list_entry(e,struct thread ,elem)->wake_ticks <= timer_ticks()){
+    if(list_entry(e,struct thread ,elem)->remaining_time <= timer_ticks()){
          struct thread *front = list_entry(e,struct thread ,elem);
          list_pop_front(&sleep_list);
          /*Insert the element that must wake up now to priority list to be listed
